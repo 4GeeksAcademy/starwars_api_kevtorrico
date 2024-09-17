@@ -47,10 +47,20 @@ class Character(db.Model):
     
 class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.Foreignkey("user.id"), nullable = False)
-    character_id = db.Column(db.Integer, db.Foreignkey("character.id"), nullable = False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False)
+    user = db.relationship("User") #Objeto de python
+
+    character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable = False)
+    character = db.relationship("Character")
+
+    def __init__(self, user, character):
+        self.user = user
+        self.character = character
+        
 
     def serialize(self):
         return {
-            "id" : self.id
+            "id" : self.id,
+            "user": self.user.username,
+            "character" : self.character.name
         }

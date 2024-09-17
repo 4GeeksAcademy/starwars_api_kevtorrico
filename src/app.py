@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Character, Favorite
 #from models import Person
 
 app = Flask(__name__)
@@ -111,6 +111,38 @@ def update_user(username):
     else:
         return jsonify({"error" : f"User with username: {username} not found" }), 500
 
+
+#READ FOR FAVORITES
+@app.route('/favorites', methods= ['GET'])
+def get_favorites():
+    favorites = Favorite.query.all()
+    fav_serializados = [favorite.serialize() for favorite in favorites]
+    return jsonify(fav_serializados), 200
+#CREATE FOR FAVORITES
+@app.route('/favorites', methods=['POST'])
+def new_favorite():
+
+    body = request.json
+    #Llamamos a los elementos del diccionario body
+    user_id = body.get('user_id', None)
+    character_id = body.get('character_id', None)
+
+    if character_id == None or user_id ==None:
+        return jsonify({"error": "Missing user_id or character_id"}), 400
+    #Llamando de la tabla
+    user = User.query.get(user_id)
+    character = Character.query.get(character_id)
+
+    if character == None or user ==None:
+        return jsonify({"error": f"User with id: {user_id} or Character with id: {character_id} not found "}), 404
+    #Creando un favorite
+    new_favorite = Favorite(user, character)
+
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify(new_favorite.serialize()), 200
+    
 
 
 
