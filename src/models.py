@@ -53,14 +53,14 @@ class Favorite(db.Model):
     character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable = False)
     character = db.relationship("Character")
 
+    #Cuando es una relacion, se construye a partir del objeto
     def __init__(self, user, character):
         self.user = user
         self.character = character
-        
 
     def serialize(self):
         return {
             "id" : self.id,
-            "user": self.user.username,
-            "character" : self.character.name
+            "user": self.user_id,
+            "character" : self.character_id
         }

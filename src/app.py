@@ -36,8 +36,8 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-
-#READ - query.all()
+#CRUD FOR USERS
+#1.READ - query.all()
 @app.route('/user', methods=['GET'])
 def handle_hello():
 
@@ -45,8 +45,7 @@ def handle_hello():
     usuarios_serializados = [persona.serialize() for persona in users]
     return jsonify(usuarios_serializados), 200
 
-
-#CREATE - save()
+#2.CREATE - save()
 @app.route('/user', methods = ['POST'])
 def add_user():
 
@@ -70,9 +69,7 @@ def add_user():
     except:
         return jsonify({"error" : "Something went wrong!" }), 500
 
-
-#DELETE - delete()
-
+#3.DELETE - delete()
 @app.route('/user/<string:username>', methods = ['DELETE'])
 def remove_user(username):
     searched_user = User.query.filter_by(username = username).one_or_none()
@@ -84,10 +81,7 @@ def remove_user(username):
     else:
         return jsonify({"error" : f"User with username: {username} not found" }), 500
 
-
-
-
-#CREATE - UPDATE
+#4.UPDATE
 @app.route('/user/<string:username>', methods = ['PUT'])
 def update_user(username):
     searched_user = User.query.filter_by(username = username).one_or_none()
@@ -112,24 +106,25 @@ def update_user(username):
         return jsonify({"error" : f"User with username: {username} not found" }), 500
 
 
-#READ FOR FAVORITES
+#CRUD FOR FAVORITES
+#1.READ
 @app.route('/favorites', methods= ['GET'])
 def get_favorites():
     favorites = Favorite.query.all()
     fav_serializados = [favorite.serialize() for favorite in favorites]
     return jsonify(fav_serializados), 200
-#CREATE FOR FAVORITES
+#2.CREATE
 @app.route('/favorites', methods=['POST'])
 def new_favorite():
 
     body = request.json
-    #Llamamos a los elementos del diccionario body
+    #Llamamos a los elementos del diccionario body de thunderman
     user_id = body.get('user_id', None)
     character_id = body.get('character_id', None)
 
     if character_id == None or user_id ==None:
         return jsonify({"error": "Missing user_id or character_id"}), 400
-    #Llamando de la tabla
+    #Buscar si el usuario y el character existen en la tabla
     user = User.query.get(user_id)
     character = Character.query.get(character_id)
 
@@ -142,8 +137,18 @@ def new_favorite():
     db.session.commit()
 
     return jsonify(new_favorite.serialize()), 200
-    
 
+#DELETE
+@app.route('/favorites/<int:id>', methods=['DELETE'])
+def remove_favorite(id):
+    searched_user = Favorite.query.filter_by(id=id).one_or_none()
+    
+    if searched_user is not None:
+        db.session.delete(searched_user)
+        db.session.commit()
+        return jsonify(searched_user.serialize()), 202
+    else:
+        return jsonify({"error": f"Favorite with id: {id} not found"}), 404
 
 
 
