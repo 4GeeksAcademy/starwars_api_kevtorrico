@@ -31,9 +31,9 @@ class Character(db.Model):
     name = db.Column(db.String(42), unique=True, nullable=False)
     height = db.Column(db.Float, nullable=False)
     weight = db.Column(db.Float, nullable=False)
-    planet_origin_id = db.Column(db.Integer, db.ForeignKey("planet.id"), nullable=False)
+    planet_origin_id = db.Column(db.Integer, db.ForeignKey("planet.id"), nullable=True)
     planet = db.relationship("Planet")
-    vehicle_id = db.Column(db.Integer, db.ForeignKey("vehicle.id"), nullable=False)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey("vehicle.id"), nullable=True)
     vehicle = db.relationship("Vehicle")
 
     def __init__(self, name, height, weight, planet, vehicle):
@@ -46,6 +46,7 @@ class Character(db.Model):
 
     def serialize(self):
         return {
+            "id" : self.id,
             "name" : self.name,
             "height" : self.height,
             "weight" : self.weight,
@@ -73,6 +74,7 @@ class Planet(db.Model):
 
     def serialize(self):
         return {
+            "id" : self.id,
             "name" : self.name,
             "density" : self.density,
             "diameter" : self.diameter,
@@ -85,7 +87,7 @@ class Vehicle(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(42), unique=True, nullable=False)
     crew = db.Column(db.Integer, nullable=False)
-    model = db.Column(db.String(15), nullable=False)
+    model = db.Column(db.String(42), nullable=False)
     cargo_capacity = db.Column(db.Float, nullable=False)
     passengers = db.Column(db.Integer, nullable=False)
 
@@ -98,6 +100,7 @@ class Vehicle(db.Model):
    
     def serialize(self):
         return {
+            "id" : self.id,
             "name" : self.name,
             "crew" : self.crew,
             "model" : self.model,
@@ -111,13 +114,13 @@ class Favorite(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable = False)
     user = db.relationship("User") #Objeto de python
 
-    character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable = False)
+    character_id = db.Column(db.Integer, db.ForeignKey("character.id"), nullable = True)
     character = db.relationship("Character")
 
-    planet_id = db.Column(db.Integer, db.ForeignKey("planet.id"), nullable = False)
+    planet_id = db.Column(db.Integer, db.ForeignKey("planet.id"), nullable = True)
     planet = db.relationship("Planet")
 
-    vehicle_id = db.Column(db.Integer, db.ForeignKey("vehicle.id"), nullable = False)
+    vehicle_id = db.Column(db.Integer, db.ForeignKey("vehicle.id"), nullable = True)
     vehicle = db.relationship("Vehicle")
 
     #Cuando es una relacion, se construye a partir del objeto
