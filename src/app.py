@@ -206,17 +206,21 @@ def add_planet():
     except:
         return jsonify({"error" : "Something went wrong!" }), 500
 
-#3.DELETE - delete()
-@app.route('/planets/<int:id>', methods = ['DELETE'])
-def remove_planet(id):
-    searched_planet = Planet.query.filter_by(id=id).one_or_none()
+# #3.DELETE - delete()
+# @app.route('/planets/<int:id>', methods = ['DELETE'])
+# def remove_planets(id):
+#     searched_planet = Planet.query.get(id)
+#     if not searched_planet:
+#         return jsonify({"error": f"Planet with id: {id} not found"}), 404
     
-    if searched_planet != None:
-        db.session.delete(searched_planet)
-        db.session.commit()
-        return jsonify(searched_planet.serialize()), 202
-    else:
-        return jsonify({"error" : f"Planet with id: {id} not found" }), 500
+#     searched_character = Character.query.filter_by(vehicle_id=id).first()
+#     searched_favorite = Favorite.query.filter_by(vehicle_id=id).first()
+#     if searched_character or searched_favorite:
+#         return jsonify({"error": "Cannot delete vehicle. It is added to characters or favorites."}), 400
+#     else:
+#         db.session.delete(searched_vehicle)
+#         db.session.commit()
+#         return jsonify(searched_vehicle.serialize()), 202
 
 
 
@@ -267,7 +271,20 @@ def add_character():
 
     return jsonify(new_character.serialize()), 200
 
-
+#DELETE
+@app.route('/characters/<int:id>', methods=['DELETE'])
+def remove_character(id):
+    searched_character = Character.query.get(id)
+    if not searched_character:
+        return jsonify({"error": f"Character with id: {id} not found"}), 404
+    
+    searched_favorite = Favorite.query.filter_by(character_id=id).first()
+    if searched_favorite:
+        return jsonify({"error": "Cannot delete character. It is added to favorites."}), 400
+    else:
+        db.session.delete(searched_character)
+        db.session.commit()
+        return jsonify(searched_character.serialize()), 202
 
 
 #CRUD FOR VEHICLES
@@ -311,10 +328,21 @@ def add_vehicle():
     except:
         return jsonify({"error" : "Something went wrong!" }), 500
 
-
-
-
-
+#3.DELETE - delete()
+@app.route('/vehicles/<int:id>', methods = ['DELETE'])
+def remove_vehicles(id):
+    searched_vehicle = Vehicle.query.get(id)
+    if not searched_vehicle:
+        return jsonify({"error": f"Vehicle with id: {id} not found"}), 404
+    
+    searched_character = Character.query.filter_by(vehicle_id=id).first()
+    searched_favorite = Favorite.query.filter_by(vehicle_id=id).first()
+    if searched_character or searched_favorite:
+        return jsonify({"error": "Cannot delete vehicle. It is added to characters or favorites."}), 400
+    else:
+        db.session.delete(searched_vehicle)
+        db.session.commit()
+        return jsonify(searched_vehicle.serialize()), 202
 
 
 
