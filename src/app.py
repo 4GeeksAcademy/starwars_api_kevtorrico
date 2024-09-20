@@ -204,23 +204,24 @@ def add_planet():
         return jsonify({"msg": "success"}), 201
     
     except:
-        return jsonify({"error" : "Something went wrong!" }), 500
+        return jsonify({"error" : "Something went wrong! That name has already been used" }), 500
 
-# #3.DELETE - delete()
-# @app.route('/planets/<int:id>', methods = ['DELETE'])
-# def remove_planets(id):
-#     searched_planet = Planet.query.get(id)
-#     if not searched_planet:
-#         return jsonify({"error": f"Planet with id: {id} not found"}), 404
+#3.DELETE - delete()
+@app.route('/planets/<int:id>', methods = ['DELETE'])
+def remove_planets(id):
+    searched_planet = Planet.query.get(id)
+    if not searched_planet:
+        return jsonify({"error": f"Planet with id: {id} not found"}), 404
     
-#     searched_character = Character.query.filter_by(vehicle_id=id).first()
-#     searched_favorite = Favorite.query.filter_by(vehicle_id=id).first()
-#     if searched_character or searched_favorite:
-#         return jsonify({"error": "Cannot delete vehicle. It is added to characters or favorites."}), 400
-#     else:
-#         db.session.delete(searched_vehicle)
-#         db.session.commit()
-#         return jsonify(searched_vehicle.serialize()), 202
+    searched_character = Character.query.filter_by(planet_origin_id=id).first()
+    searched_favorite = Favorite.query.filter_by(planet_id=id).first()
+    if searched_character or searched_favorite:
+        return jsonify({"error": "Cannot delete vehicle. It is added to characters or favorites."}), 400
+    else:
+        db.session.delete(searched_planet)
+        db.session.commit()
+        return jsonify(searched_planet.serialize()), 202
+
 
 
 
@@ -326,7 +327,7 @@ def add_vehicle():
         return jsonify({"msg": "success"}), 201
     
     except:
-        return jsonify({"error" : "Something went wrong!" }), 500
+        return jsonify({"error" : "Something went wrong! That name has already been used" }), 500
 
 #3.DELETE - delete()
 @app.route('/vehicles/<int:id>', methods = ['DELETE'])
