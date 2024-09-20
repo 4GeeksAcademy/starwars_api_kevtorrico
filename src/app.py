@@ -132,16 +132,28 @@ def new_favorite():
     planet_id = body.get('planet_id', None)
     vehicle_id = body.get('vehicle_id', None)
 
-    if character_id == None or user_id ==None or planet_id==None or vehicle_id ==None:
-        return jsonify({"error": "Missing user_id or character_id or planet_id or vehicle_id"}), 400
+    if user_id ==None:
+        return jsonify({"error": "Missing user_id"}), 400
     #Buscar si el usuario, character, planet y vehiculo existen en la tabla
     user = User.query.get(user_id)
-    character = Character.query.get(character_id)
-    planet = Planet.query.get(planet_id)
-    vehicle = Vehicle.query.get(vehicle_id)
+    character = Character.query.get(character_id) if character_id is not None else None
+    planet = Planet.query.get(planet_id) if planet_id is not None else None
+    vehicle = Vehicle.query.get(vehicle_id) if vehicle_id is not None else None
 
-    if character == None or user ==None or planet ==None or vehicle ==None:
-        return jsonify({"error": f"User with id: {user_id} or Character with id: {character_id} or Planet with id: {planet_id} or Vehicle with id: {vehicle_id} not found "}), 404
+    errors=[]
+    if user is None:
+        errors.append(f"User with id: {user_id} not found")
+    if character_id is not None and character is None:
+        errors.append(f"Character with id: {character_id} not found")
+    if planet_id is not None and planet is None:
+        errors.append(f"Planet with id: {planet_id} not found")
+    if vehicle_id is not None and vehicle is None:
+        errors.append(f"Vehicle with id: {vehicle_id} not found")
+    if character_id == None and vehicle_id==None and character_id==None:
+        return jsonify({"error": "Favorites must have at least one of these: planet_id, character_id, or vehicle_id"}), 400
+    if errors:
+        return jsonify({"error": " or ".join(errors)}), 404
+    
     #Creando un favorite
     new_favorite = Favorite(user, character, planet, vehicle)
 
